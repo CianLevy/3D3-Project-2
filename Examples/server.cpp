@@ -11,7 +11,7 @@ class server
 {
 public:
   server(boost::asio::io_context& io_context, short port)
-    : socket_(io_context, udp::endpoint(udp::v4(), port))
+    : socket_(io_context, udp::endpoint(udp::v4(), port)) //Initialisation list initialises with the provided IO context and port
   {
     do_receive();
   }
