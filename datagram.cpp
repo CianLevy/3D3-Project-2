@@ -2,31 +2,25 @@
 #include <iostream>
 
 datagram::datagram(std::vector<uint8_t> d){
-    //Default values:
-    sourceID = 0;
-    t = type::data;
-    length = 0;
+    t = (type)d.at(0);
+    sourceID = (char)d.at(1);
+    payload.insert(payload.begin(), d.begin() + 2, d.end());
+    length = payload.size();
 
-    try {
-        t = type(d.at(0)); //First bit is the type
-        std::string header(d.begin(), d.begin() + (d.size() < 10 ? d.size() : 10)); //Assume the header is less than 10 bytes
-
-        std::size_t found = header.find("\n");
-        header = header.substr(found); //Extract the remaining half of the header
-        found = header.find("\r\n");
-
-        sourceID = (header.length() > 0 && found != std::string::npos) ? header.at(found - 1) : 0;
-        length = d.size();
-    }
-    catch (std::exception& e) {
-        std::cerr << "Exception occured parsing the datagram: " << e.what() << "\n";
-    }
 }
 
-datagram::datagram(type t, char sourceID, std::vector<uint8_t> payload){
-    std::string header = std::to_string(t) + "\n" + sourceID + "\r\n";
+datagram::datagram(type t_, char sourceID_, std::vector<uint8_t> payload_){
+    t = t_;
+    sourceID = sourceID_;
+    payload = payload_;
+    length = payload.size() + 2;  
+}
 
-    packet.insert(packet.begin(), header.begin(), header.end());
-    packet.insert(packet.end(), payload.begin(), payload.end());
-    length = packet.size();
+std::vector<uint8_t> datagram::buildDatagram(){
+    std::vector<uint8_t> d;
+    char typeState = (char)(t & 0xFF);
+    d.insert(d.begin(), &typeState, &typeState + sizeof(char));
+    d.insert(d.end(), &sourceID, &sourceID + sizeof(char));
+    d.insert(d.end(), &payload[0], &payload[0] + payload.size());
+    return d;
 }

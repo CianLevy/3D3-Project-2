@@ -2,7 +2,7 @@ CXX=g++
 CXXOPTIMIZE= -O2
 BOOST_ROOT = boost_1_66_0
 CXXFLAGS= -Wall -pthread -std=c++11 $(CXXOPTIMIZE) -I$(BOOST_ROOT)
-LDFLAGS := -lboost_system
+LDFLAGS := -L$(BOOST_ROOT)/stage/lib -lboost_system
 
 USERID=EDIT_MAKE_FILE
 CLASSES=

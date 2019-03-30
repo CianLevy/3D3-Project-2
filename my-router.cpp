@@ -5,8 +5,6 @@
 #include "router.cpp"
 
 
-
-
 //Program entry point. The provided argument will specify the file name of any data packets being sent
 int main(int argc, char* argv[]){
 
@@ -15,7 +13,7 @@ int main(int argc, char* argv[]){
         if (std::stoi(argv[1]) == -1){
             std::string p = "Example payload";
             std::vector<uint8_t> p_vector(p.begin(), p.end());
-            datagram d(datagram::type::control, 'A', p_vector);
+            datagram d(datagram::type::data, 'A', p_vector);
             router r(10004);
             r.singleSend(d);
         }
