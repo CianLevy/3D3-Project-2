@@ -23,6 +23,12 @@ class distance_vector {
         //Getters and setters for all the fields
 
         distance_vector(std::vector<uint8_t> buffer); //Construct a distance vector from a vector containing the relevant fields
-        distance_vector(char sourceID, char destID, uint8_t cost, std::string sourceIP, uint16_t port); //Construct a distance vector by passing the relevant values
+        distance_vector(char sourceID, char destID, std::vector<uint8_t> cost, std::string sourceIP, uint16_t port); //Construct a distance vector by passing the relevant values
         std::vector<uint8_t> buildDV(); //Add the private attributes to a vector and return the vector
+
+        char getSourceID{ return sourceID};
+        char getDestID{ return destID};
+        std::vector<uint8_t> getCost {return cost;};
+        std::string getIP{ return sourceIP};
+        std::vector<uint16_t> getPort{ return sourcePort; };
 };
