@@ -34,7 +34,8 @@
 
 class logger{
     private:
-        std::ofstream fileStream;
+        std::ofstream fileStreamI;
+        std::ofstream fileStreamO;
         route_table previousTable; 
 
     public:
