@@ -43,5 +43,5 @@ class logger{
         void recordTableUpdate(route_table currentTable); //All the information required to record the table update is provided by "previousTable" and currentTable
                                                          //ctime will have to be used to record the time of the update
         void recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort); //The majority of the required information is stored in the datagram class
-        std::string getrouteID(){ return routeID; }
+        std::string getrouteID(){ return routeID; } //Returns the log name of the route ID. Doesn't return the actual route ID
 };
