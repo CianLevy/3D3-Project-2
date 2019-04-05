@@ -33,6 +33,7 @@ void logger::recordDVUpdate(distance_vector currentDV, struct dv_update cause){
 	}
 }
 
+<<<<<<< HEAD
 void logger::insertDVinFile(distance_vector d){
 	file << std::setw(15) << std::left << "Destination" << 
 			std::setw(15) << std::left << "Next router" << 
@@ -50,6 +51,26 @@ void logger::insertDVinFile(distance_vector d){
 		}
 	}
 }
+=======
+void logger::recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort){
+	std::vector<uint8_t> pay = d.getPayload();
+	uint8_t payLength = d.getLength(); /* Getting the size of the payload */
+	char sourceID = d.getID();
+	char destID = d.getDestID();
+	fileStream.open("log_file.txt", std::ios::app); /* Opening a seperate log file to store all transfers */
+	fileStream << "The Packet Source ID is " << sourceID << std::endl;
+	fileStream << "The Destination ID is " << destID << std::endl;
+	fileStream<< "Arrival UDP Port is " << unsigned(arrivalPort) << std::endl;
+	fileStream << "The Forward Port is " << unsigned(departPort) << std::endl;
+
+	/* Printing the entire payload */
+	fileStream << "The Packet Payload contains: " << std::endl;
+	for(int i = 0; i <= payLength; i++){
+		fileStream << unsigned(pay[i]) << std::endl;
+	}
+
+	fileStream.close();
+>>>>>>> 0b2ac547dd34f013d38d7144603329134d8b4bf4
 
 void logger::insertDVUpdate(struct dv_update d){
 	file << "DV update from " << d.sourceID << std::endl;

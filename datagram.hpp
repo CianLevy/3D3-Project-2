@@ -29,6 +29,7 @@ class datagram{
         std::vector<uint8_t> getPayload() { return payload; };
         char getType() { return t; };
         char getID() { return sourceID; };
+        char getDestID() { return destID; };
         uint8_t getLength() { return length; };
         void setDestID(char destID_){ destID = destID_;};
         char getDestID() { return destID; };
