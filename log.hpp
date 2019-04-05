@@ -8,6 +8,7 @@
 #include "distance-vector.hpp"
 
 #define SAVE_DIR "logs/routing-outputX.txt"
+#define INDENT 5
 /*
     Class overview:
     This class will be responsible for recording: changes to the routing table, datagrams received and routed.
@@ -42,6 +43,7 @@ class logger{
 
         void insertDVinFile(distance_vector d);
         void insertDVUpdate(struct dv_update d);
+        std::string addIndentation(int indentDepth);
 
     public:
         logger(char ID); //When constructing the logger and opening the log, only the router ID is required to fully specify the file name

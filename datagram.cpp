@@ -1,5 +1,4 @@
 #include "datagram.hpp"
-#include <iostream>
 
 datagram::datagram(std::vector<uint8_t> d, uint8_t length_){
     d.shrink_to_fit();
