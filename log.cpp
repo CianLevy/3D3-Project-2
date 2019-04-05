@@ -2,36 +2,82 @@
 
 
 logger::logger(char ID){
-	std::string route_ID = "routing-output" << ID;
+	std::string dir = SAVE_DIR;
+	dir[19] = ID;
+	file.open(dir);
+	previousDV = nullptr;
+}
+void logger::recordDVUpdate(distance_vector currentDV, struct dv_update cause){
+	time_t tt;
+	struct tm * ti;
+	time (&tt); 
+	ti = localtime(&tt); 
+	std::string time = asctime(ti);
+
+
+	if (file.is_open()){
+		file << time.substr(0, time.size() -1) << ": <DV Update>" << std::endl;
+		insertDVUpdate(cause);
+
+		if (previousDV != nullptr){
+			file << "Previous DV state:" << std::endl;
+			insertDVinFile(*previousDV);
+		}
+
+		file << "Current DV state" << std::endl;
+		insertDVinFile(currentDV);
+		file << "</DV Update>" << std::endl;
+		file << std::endl;
+		
+		previousDV = new distance_vector(currentDV);
+	}
 }
 
-void logger::recordTableUpdate(route_table rt){
-	//Reading whats in the file first
-	fileStreamI.open("route_ID");
-	std::string line; //Current line in the file
-	getline(fileStreamI, line); //Loading the first line
+void logger::insertDVinFile(distance_vector d){
+	file << std::setw(15) << std::left << "Destination" << 
+			std::setw(15) << std::left << "Next router" << 
+			std::setw(15) << std::left << "Port" <<
+			std::setw(15) << std::left << "Cost" << std::endl;
 
-	if(fileStreamI.is_open()){
-		do{
-			std::cout << line << '\n';
-		  } while (getline(fileStreamI, line));
-	fileStreamI.close();
-	}
+	for (std::size_t i = 0; i < d.getCurrentDV().size(); i++){
+		if ((d.getCurrentDV().at(i)).cost != 0xFF){
 
-	//Writing to the file
-	fileStreamO.open("route_ID");
 
-	time_t update_time;
-	update_time = time(NULL);
-	char *tm = ctime(&update_time);
-	fileStreamO << "Router updated at " << tm << std::endl;
-
-	if(fileStreamO.is_open()){
-		outputStream << rt << std::endl;
+			file << std::setw(15) << std::left << (char)(i + 65) <<  
+					std::setw(15) << std::left << (d.getCurrentDV().at(i)).nextHopID << 
+					std::setw(15) << std::left << (d.getCurrentDV().at(i)).port << 
+					std::setw(15) << std::left << (int)((d.getCurrentDV().at(i)).cost) <<  std::endl;
+		}
 	}
 }
 
-void logger::recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort){
+void logger::insertDVUpdate(struct dv_update d){
+	file << "DV update from " << d.sourceID << std::endl;
+	file << std::setw(15) << std::left << "Destination" <<
+			std::setw(15) << std::left << "Cost" << std::endl;
+	
+	for (std::size_t i = 0; i < d.costs.size(); i++){
+		if (d.costs.at(i) != 0xFF){
+			file << std::setw(15) << std::left << (char)(i + 65) <<
+					std::setw(15) << std::left << (int)d.costs.at(i) << std::endl;
+		}
+	}
+	file << std::endl;
+}
+
+void logger::recordInitialDV(distance_vector currentDV){
+	time_t tt;
+	struct tm * ti;
+	time (&tt); 
+	ti = localtime(&tt); 
+	std::string time = asctime(ti);
 
 
+	if (file.is_open()){
+		file << time.substr(0, time.size() -1) << ": <Initialised DV>" << std::endl;
+		insertDVinFile(currentDV);
+
+		file << "</Initialised DV>" << std::endl;
+		file << std::endl;
+	}
 }

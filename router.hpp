@@ -1,17 +1,20 @@
 #pragma once
 #include <boost/asio.hpp>
-#include "route-table.hpp"
+//#include <boost/date_time/posix_time/posix_time.hpp>
+#include "boost/bind.hpp" 
+
 #include "datagram.hpp"
 #include "log.hpp"
 #include "distance-vector.hpp"
 #include <iostream>
 #include <string>
-#include "route-table.cpp"
 #include "distance-vector.cpp"
 #include "log.cpp"
 
 #define BUFFERLENGTH 100
-#define DEBUG true
+#define DEBUG false
+#define MAXCONNECTIONS 26
+#define REFRESHPERIOD 1 //Defines how frequently the distance vector is advertised
 
 using boost::asio::ip::udp;
 
@@ -24,24 +27,29 @@ using boost::asio::ip::udp;
 
 class router{
     private:
-        route_table table;
-        logger* l;
-        udp::socket *socket_;
-        udp::endpoint server_endpoint;
-        std::vector<uint8_t> buffer;
-        router* r;
-        bool stop;
-        boost::asio::io_context io_context;
-        char routerID;
-        std::string ip;
-        uint16_t port;
+        //To do: reformat and simplify. Use initialisation lists instead of pointers
+        distance_vector*                    dv;
+        logger*                             l;
+        udp::socket*                        socket_;
+        udp::endpoint                       server_endpoint;
+        std::vector<uint8_t>                buffer;
+        router*                             r;
+        bool                                stop;
+        boost::asio::io_context             io_context;
+        char                                routerID;
+        std::string                         ip;
+        uint16_t                            port;
+        uint8_t                             timeSinceReceived[MAXCONNECTIONS];
+        bool                                received[MAXCONNECTIONS];
+        boost::asio::deadline_timer         timer;
+
+        void periodicRetransmit();
 
     public:
         void forwardDatagram(datagram d); //Forward the datagram to the correct link based on the values in the table
         void singleSend(datagram d); //Send a single datagram and close the server
-        route_table getTable(){ return table; };
         void receive();
-        router(uint16_t port_); //Initialise the router with a specified listening port
+        router(char ID); //Initialise the router with a specified id
         void run(); //Launch the router and wait for connections
-        void broadcast(datagram d); //Function to send a datagram to all of router's immediate neighbours
+        void broadcast(bool control, std::vector<uint8_t> payload); //Function to send a datagram to all of router's immediate neighbours
 };

@@ -2,10 +2,12 @@
 #include <string>
 #include <fstream>
 #include <ctime>
-#include "route-table.hpp"
+#include <iomanip>
 #include "datagram.hpp"
 #include "datagram.cpp"
+#include "distance-vector.hpp"
 
+#define SAVE_DIR "logs/routing-outputX.txt"
 /*
     Class overview:
     This class will be responsible for recording: changes to the routing table, datagrams received and routed.
@@ -34,13 +36,17 @@
 
 class logger{
     private:
-        std::ofstream fileStreamI;
+        std::ofstream file;
         std::ofstream fileStreamO;
-        route_table previousTable; 
+        distance_vector* previousDV;
+
+        void insertDVinFile(distance_vector d);
+        void insertDVUpdate(struct dv_update d);
 
     public:
         logger(char ID); //When constructing the logger and opening the log, only the router ID is required to fully specify the file name
-        void recordTableUpdate(route_table currentTable); //All the information required to record the table update is provided by "previousTable" and currentTable
+        void recordDVUpdate(distance_vector currentDV, struct dv_update cause); //All the information required to record the table update is provided by "previousTable" and currentTable
                                                         //ctime will have to be used to record the time of the update
         void recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort); //The majority of the required information is stored in the datagram class
+        void recordInitialDV(distance_vector currentDV);
 };

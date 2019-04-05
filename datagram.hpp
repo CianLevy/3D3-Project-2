@@ -2,6 +2,8 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+
+#define DEBUG false
 /*
     Class overview:
     This class encapsulates the datagrams which are transmitted between routers. It is used by the router class to both construct and deconstruct datagrams.
@@ -19,8 +21,8 @@ class datagram{
     public:
           
         enum type {data, control};
-        datagram(type t_, char sourceID_, std::vector<uint8_t> payload_);
-        datagram(std::vector<uint8_t> d); //Demultiplex a received datagram and extract its payload
+        datagram(type t_, char sourceID_, char destID_, std::vector<uint8_t> payload_);
+        datagram(std::vector<uint8_t> d, uint8_t length_); //Demultiplex a received datagram and extract its payload
 
         std::vector<uint8_t> buildDatagram();
 
@@ -28,12 +30,16 @@ class datagram{
         char getType() { return t; };
         char getID() { return sourceID; };
         uint8_t getLength() { return length; };
+        void setDestID(char destID_){ destID = destID_;};
+        char getDestID() { return destID; };
 
     private:
         std::vector<uint8_t> payload;
         type t;
         char sourceID;
         char destID;
+
+       
 
         uint8_t length;
 

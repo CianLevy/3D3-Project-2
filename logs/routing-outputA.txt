@@ -1,0 +1,27 @@
+Fri Apr  5 21:18:52 2019: <Initialised DV>
+Destination    Next router    Port           Cost           
+A              A              10000          0              
+B              B              10001          4              
+E              E              10005          1              
+</Initialised DV>
+
+Fri Apr  5 21:18:53 2019: <DV Update>
+DV update from E
+Destination    Cost           
+A              1              
+B              2              
+C              4              
+D              6              
+E              0              
+F              3              
+
+Current DV state
+Destination    Next router    Port           Cost           
+A              A              10000          0              
+B              E              10005          3              
+C              E              10005          5              
+D              E              10005          7              
+E              E              10005          1              
+F              E              10005          4              
+</DV Update>
+

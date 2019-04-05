@@ -1,6 +1,5 @@
 #include <iostream>
 #include "datagram.hpp"
-#include "datagram.cpp"
 #include "router.hpp"
 #include "router.cpp"
 
@@ -9,18 +8,23 @@
 int main(int argc, char* argv[]){
 
     if (argc > 1){
-        std::cout << argv[1] << std::endl;
-        if (std::stoi(argv[1]) == -1){
+
+        if (argv[1][0] == '0'){
             std::string p = "Example payload";
             std::vector<uint8_t> p_vector(p.begin(), p.end());
-            datagram d(datagram::type::data, 'A', p_vector);
-            router r(10004);
+            datagram d(datagram::type::data, 'A','B', p_vector);
+            router r('A');
             r.singleSend(d);
+        }
+        else{
+            std::cout << "Launching router " << argv[1][0] << std::endl;
+            router r(argv[1][0]);
+            r.run();
         }
 
     }
     else{
-        router r(10000);
-        r.run();
+        std::cout << "Invalid arguments" << std::endl;
     }  
+
 }

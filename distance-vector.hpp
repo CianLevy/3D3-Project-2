@@ -2,6 +2,23 @@
 #include <vector>
 #include <cstdint> //uint
 #include <string>
+#include <iomanip> //setw
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+#include <limits.h>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+
+#define DVLENGTH 26 //26 characters in the alphabet
+#define INITIAL_LINKS "resources/links.csv"
+#define CONVERTID(id) (id - 65) //IDs are capital letters and must be mapped to ints starting from 0
+#define DEBUG false
+
+
 /*
     Class overview:
     This class encapsulates the distance vectors and their data. It will be used by the router to add all the data required to advertise a new link
@@ -10,25 +27,41 @@
 
     Note: the implementation of this class will be very similar to the datagram class
 */
+struct link
+ {
+    char nextHopID; //ID of the router the link connects to
+    std::string ip; //Link router's IP
+    uint16_t port; //Link router's listening port
+    uint8_t cost; //Link cost 
+};
+
+struct dv_update{
+    char sourceID;
+    std::vector<uint8_t> costs;
+};
 
 class distance_vector {
     private:
-        char sourceID;
-        char destID;
-        uint8_t cost;
-        std::string sourceIP;
-        uint16_t sourcePort;
+        char routerID;
+        std::vector<struct link> currentDV; //The actual distance vector. Node ids correspond to their location in the vector where the current cost is stored
+        
+        struct link buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_);
+        uint16_t listenPort;
+        
 
     public:
-        //Getters and setters for all the fields
+        distance_vector(char ID);
+        distance_vector(const distance_vector &old);    //Copy constructor
 
-        distance_vector(std::vector<uint8_t> buffer); //Construct a distance vector from a vector containing the relevant fields
-        distance_vector(char sourceID, char destID, std::vector<uint8_t> cost, std::string sourceIP, uint16_t port); //Construct a distance vector by passing the relevant values
-        std::vector<uint8_t> buildDV(); //Add the private attributes to a vector and return the vector
+        bool updateDV(dv_update d);
+        void readLinkCosts();
+        struct dv_update buildDVUpdate(std::vector<uint8_t> buffer);
+        std::vector<uint8_t> getDVUpdate();
+        void printDV();
+        struct link getLink(char destID);
+        void printForwardTable();
 
-        char getSourceID{ return sourceID};
-        char getDestID{ return destID};
-        std::vector<uint8_t> getCost {return cost;};
-        std::string getIP{ return sourceIP};
-        std::vector<uint16_t> getPort{ return sourcePort; };
+        std::vector<struct link> getCurrentDV(){return currentDV;};
+
+        uint16_t getListenPort(){ return listenPort; };
 };

@@ -1,157 +1,162 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define MAXDIST 9999
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include <limits.h>
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <vector>
 #include "distance-vector.hpp"
 
 using namespace std;
+distance_vector::distance_vector(char ID){
+	routerID = ID;
 
-distance_vector::distance_vector(std::vector<uint8_t> buffer) {
-	sourceID = (char)buffer.at(0);
-	destID = (char)buffer.at(1);
-	sourceIP = (char)buffer.at(2);
-	std::vector<uint8_t>temp.insert(temp.begin(), buffer.begin() + 3, buffer.at(4));
-	cost = temp.size();
-	std::vector<uint8_t>temp2.insert(temp2.begin(), buffer.begin() + 3 + cost, buffer.end());
-	sourcePort = temp2.size();
-}
-distance_vector::distance_vector(char sourceID, char destID, std::vector<uint8_t> cost, std::string sourceIP, uint16_t port) {
-	sourceID = sourceID;
-	destID = destID;
-	cost = cost;
-	sourceIP = sourceIP;
-	port = port;
+	for (int i = 0; i < DVLENGTH; i++){
+        struct link l;
+		if (i == CONVERTID(routerID))
+			l = buildLink(routerID, "127.0.0.1", 0xFFFF, 0); //The cost for a router to get to itself is 0
+		else
+			l = buildLink(0xFF, "127.0.0.1", 0xFFFF, 0xFF); //Initialise as a flagged null link
+        currentDV.push_back(l);
+    }
+	readLinkCosts();
 }
 
+distance_vector::distance_vector(const distance_vector &old){
+	routerID = old.routerID;
+	listenPort = old.listenPort;
 
-std::vector<uint8_t> distance_vector::buildDV() {
-	std::vector<uint8_t> dv;
-	dv.insert(dv.begin(), &sourceID, &sourceID + sizeof(char));
-	dv.insert(dv.end(), &destID, &destID + sizeof(char));
-	dv.insert(dv.end(), &sourceIP, sourceIP.begin(), sourceIP.end());
-	dv.insert(dv.end(), &cost, &cost + cost.size());
-	dv.insert(dv.end(), &sourcePort, &sourcePort + sourcePort.size());
-	return dv;
+	currentDV.insert(currentDV.begin(), old.currentDV.begin(), old.currentDV.end());
 }
 
-// I've never worked with vectors before so I believe I'm making a few mistakes I'll have to fix.
-// This code doesn't compile due to the errors I've made with handling the vectors, but the 
-// minimisation distance vector algorithm does work.
-struct Graph {
-	//std::vector<uint8_t> 
-	struct distance_vector* dv;
-	int num_nodes;
-	int num_connections;
-};
+bool distance_vector::updateDV(dv_update d){
+	//To do: handle link cost increases and router drop out
+	bool update = false;
+	int loopLength = (d.costs.size() < currentDV.size()) ? d.costs.size() : currentDV.size();
 
+	for (int i = 0 ; i < loopLength; i++){
+		if (currentDV.at(i).cost > currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)	//Option 1: the link is cheaper
+			|| ((currentDV.at(i).cost == currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)) && d.sourceID < currentDV.at(i).nextHopID && (d.costs).at(i) != 0xFF)){	//Option 2: the link is the same cost but router ID is lower
+			#if DEBUG
+				std::cout << "Update from " << d.sourceID << std::endl;
+				std::cout << "Previous cost to " << (char)(i + 65) << ": " << (int)currentDV.at(i).cost << std::endl;
+				std::cout << "Updated next hop to " << d.sourceID << " with total cost: " << (int)(currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)) << std::endl;
+				std::cout << "\n";
+			#endif
 
-//struct connection {
-//	struct distance_vector sourceID, destID;
-//int cost;
-//};
+			uint8_t previousCost = currentDV.at(i).cost;
 
+			currentDV.at(i).cost = currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i);
+			currentDV.at(i).nextHopID = currentDV.at(CONVERTID(d.sourceID)).nextHopID; //Handles the case where a direct neighbour is no longer the preferred route to itself
+			currentDV.at(i).ip = currentDV.at(CONVERTID(d.sourceID)).ip;
+			currentDV.at(i).port = currentDV.at(CONVERTID(d.sourceID)).port;
 
+			for (std::size_t j = 0 ; j < currentDV.size(); j++){
+				if (currentDV.at(j).nextHopID  == (char)(i + 65)){   //if the next hop is the router which was just updated in the new link: update the cost with the new cost
+					currentDV.at(j).cost += currentDV.at(i).cost - previousCost; //Remove the previous cost and update with the new cost
+					currentDV.at(j).nextHopID = currentDV.at(CONVERTID(d.sourceID)).nextHopID;
+					currentDV.at(j).ip = currentDV.at(CONVERTID(d.sourceID)).ip;
+					currentDV.at(j).port = currentDV.at(CONVERTID(d.sourceID)).port;
 
-struct Graph* createGraph(int number_connections) {
+					#if DEBUG
+						std::cout << "Previous cost to " << (char)(j + 65) << ": " << (int)previousCost << std::endl;
+						std::cout << "New total cost: " << (int)(currentDV.at(j).cost) << std::endl;
+						std::cout << "\n";
+					#endif
+				}
+			}
+			update = true;
+        }
 
-	struct Graph* graph1 = (struct Graph*) malloc(sizeof(struct Graph));
-	
-	graph1->num_connections = number_connections;
-	graph1->dv = (struct distance_vector*) malloc( number_connections * sizeof(struct distance_vector));
-	
-	return graph1;
-}
-
-
-void DV_algo(struct Graph* graph, int source, int num_connections, int num_nodes) {
-	//int num_nodes = 6;
-	int shortest_distance[6];
-
-
-	for (int i = 0; i < 6; i++) { shortest_distance[i] = MAXDIST; }
-	shortest_distance[source] = 0;
-
-	//The shortest path of graph that contain V vertices, never contain "V-1" edges. So we do here "V-1" relaxations
-	for (int i = 1; i <= 6 - 1; i++){
-
-		for (int j = 0; j < num_connections; j++){
-			//formula adapted fromhttps://cseweb.ucsd.edu/classes/fa11/cse123-a/123f11_Lec9.pdf
-			
-
-			int u = graph->dv[j].sourceID;
-			int v = graph->dv[j].destID;
-			int cost = graph->dv[j].cost;
-
-			if (shortest_distance[u] + cost < shortest_distance[v])
-				shortest_distance[v] = shortest_distance[u] + cost;
-		}
 	}
+	return update;
 }
 
+void distance_vector::printDV(){
+	std::cout << "Distance vector for router " << routerID << std::endl;
+    std::cout <<  std::setw(15) << std::left << "Destination" << std::setw(15) << std::left <<  
+    "Cost" <<  std::endl;
 
-int get_num_connections() {
-	
-	ifstream infile;
-	infile.open("links.csv");
-	if (!infile) {
-		cerr << "Error opening 'links.csv'";
-		exit(1);
-	}
+   	for (std::size_t i = 0; i < currentDV.size(); i++){
+		if (currentDV.at(i).cost != 0xFF)	//Link is not flagged as not existing
+			std::cout << std::setw(15) << std::left << (char)(i + 65)
+						<<  std::setw(15) << std::left << (int)currentDV.at(i).cost << std::endl;
 
-	int connections = 0;
-	string a;
-	ifstream infile("links.csv");
-
-	while (getline(infile, a)) {connections++;}
-	infile.close();
-	return connections;
-
+    }
 }
 
-
-int main() {
-
-	char node1, node2;
-	int port_num, cost, num_nodes = 6;
-
-	int num_connections = get_num_connections();
-
-	struct Graph* graph1 = createGraph(num_connections);    
-
-	ifstream infile;
-	infile.open("links.csv");
+void distance_vector::readLinkCosts(){
+    
+    std::ifstream infile;
+	infile.open(INITIAL_LINKS);
 	if (!infile) {
-		cerr << "Error opening 'links.csv'";
+		std::cerr << "Error opening 'links.csv'";
 		exit(1);   
 	}
+    
+    char source, dest;
+    uint16_t port;
+    uint8_t cost;
+    std::string ip = "127.0.0.1"; //Assume localhost
+    std::string buffer;
 
-	int i = 0;
 	while (!infile.eof()) {
-
-		infile >> node1;
-		infile >> node2;
-		infile >> port_num;
-		infile >> cost;
-		i++;
-		graph1->dv[0].buildDV( node1,  node2, cost, 0 ,  port_num);
-
-
-		if (i > num_connections) {
-			cout << "Error in file";
-			exit(1);
+        std::getline(infile, buffer, ',');
+        source = buffer[0];
+        std::getline(infile, buffer, ',');
+        dest = buffer[0];
+        std::getline(infile, buffer, ',');
+        port = std::stoi(buffer);
+        std::getline(infile, buffer, '\n');
+        cost = std::stoi(buffer);
+        
+        if (source == routerID)   //Only interested in immediate neighbours
+            (currentDV.at(CONVERTID(dest))) = buildLink(dest, ip, port, cost);
+		else if (dest == routerID){
+			currentDV.at(CONVERTID(dest)).port = port;
+			listenPort = port;
 		}
 	}
 	infile.close();
+}
 
-	int source = 0;
-	DV_algo(graph1, source, num_nodes, num_connections);
+struct link distance_vector::buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_){
+    struct link l;
+    l.nextHopID = routerID_;
+    l.ip = ip_;
+    l.port = port_;
+    l.cost = cost_;
+    return l;
+}
 
-	return 0;
+struct link distance_vector::getLink(char destID){
+    return (currentDV.at(CONVERTID(destID)));
+}
+
+struct dv_update distance_vector::buildDVUpdate(std::vector<uint8_t> buffer){
+	struct dv_update d;
+	d.sourceID = (char)buffer.at(0);
+	d.costs.insert(d.costs.begin(), buffer.begin() + 1, buffer.end());
+
+	return d;
+}
+
+std::vector<uint8_t> distance_vector::getDVUpdate(){
+	std::vector<uint8_t> temp;
+	temp.push_back((uint8_t)routerID);
+
+	for (struct link l : currentDV){
+		temp.push_back(l.cost);
+	}
+
+	return temp;
+}
+
+void distance_vector::printForwardTable(){
+    std::cout << "Forward table for " << routerID << std::endl;
+    std::cout <<  std::setw(15) << std::left << "Destination" << std::setw(15) << std::left <<  
+    "Next router" << std::setw(15) << std::left << "Port" <<
+    std::setw(15) << std::left << "Cost" << std::endl;
+
+    for (std::size_t i = 0; i < currentDV.size(); i++){
+        if ((currentDV.at(i)).cost != 0xFF){
+            std::cout <<  std::setw(15) << std::left << (char)(i + 65) <<  std::setw(15) << std::left
+                        << (currentDV.at(i)).nextHopID << std::setw(15) << std::left
+                        << (currentDV.at(i)).port << std::setw(15) << std::left
+                        << (int)((currentDV.at(i)).cost) <<  std::endl;
+        }
+    }
 }
