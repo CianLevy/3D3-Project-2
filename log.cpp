@@ -1,9 +1,10 @@
 #include "log.hpp"
 
 
-logger::logger(char ID){
+logger::logger(char ID_){
+	ID = ID_;
 	std::string dir = SAVE_DIR;
-	dir[19] = ID;
+	dir[19] = ID_;
 	file.open(dir);
 	previousDV = nullptr;
 }
@@ -17,15 +18,15 @@ void logger::recordDVUpdate(distance_vector currentDV, struct dv_update cause){
 	if (file.is_open()){
 		file << "<DV Update>" << std::endl;
 		file << addIndentation(INDENT) << "Time: " << asctime(ti);
-		insertDVUpdate(cause);
+		insertDVUpdate(cause, 2 * INDENT);
 
 		if (previousDV != nullptr){
 			file << addIndentation(INDENT) << "Previous DV state:" << std::endl;
-			insertDVinFile(*previousDV);
+			insertDVinFile(*previousDV, 2 * INDENT);
 		}
 
-		file << addIndentation(INDENT) << "Current DV state" << std::endl;
-		insertDVinFile(currentDV);
+		file << addIndentation(INDENT) << "Current DV state:" << std::endl;
+		insertDVinFile(currentDV, 2 * INDENT);
 		file << "</DV Update>" << std::endl;
 		file << std::endl;
 		
@@ -33,54 +34,66 @@ void logger::recordDVUpdate(distance_vector currentDV, struct dv_update cause){
 	}
 }
 
-void logger::insertDVinFile(distance_vector d){
-	file << addIndentation(INDENT) << std::setw(15) << std::left << "Destination" << 
-			std::setw(15) << std::left << "Next router" << 
-			std::setw(15) << std::left << "Port" <<
-			std::setw(15) << std::left << "Cost" << std::endl;
+void logger::insertDVinFile(distance_vector d, int indent){
+	if (file.is_open()){
+		file << addIndentation(indent) << std::setw(15) << std::left << "Destination" << 
+				std::setw(15) << std::left << "Next router" << 
+				std::setw(15) << std::left << "Port" <<
+				std::setw(15) << std::left << "Cost" << std::endl;
 
-	for (std::size_t i = 0; i < d.getCurrentDV().size(); i++){
-		if ((d.getCurrentDV().at(i)).cost != 0xFF){
+		for (std::size_t i = 0; i < d.getCurrentDV().size(); i++){
+			if ((d.getCurrentDV().at(i)).cost != 0xFF){
 
 
-			file << addIndentation(INDENT) << std::setw(15) << std::left << (char)(i + 65) <<  
-					std::setw(15) << std::left << (d.getCurrentDV().at(i)).nextHopID << 
-					std::setw(15) << std::left << (d.getCurrentDV().at(i)).port << 
-					std::setw(15) << std::left << (int)((d.getCurrentDV().at(i)).cost) <<  std::endl;
+				file << addIndentation(indent) << std::setw(15) << std::left << (char)(i + 65) <<  
+						std::setw(15) << std::left << (d.getCurrentDV().at(i)).nextHopID << 
+						std::setw(15) << std::left << (int)(d.getCurrentDV().at(i)).port << 
+						std::setw(15) << std::left << (int)((d.getCurrentDV().at(i)).cost) <<  std::endl;
+			}
 		}
+		file << std::endl;
 	}
 }
 
 void logger::recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort){
-	std::vector<uint8_t> pay = d.getPayload();
-	uint8_t payLength = d.getLength(); /* Getting the size of the payload */
-	char sourceID = d.getID();
-	char destID = d.getDestID();
-
-	file << "<Routed Packet>" << std::endl;
-	file << addIndentation(INDENT) << "The Packet Source ID is " << sourceID << std::endl;
-	file << addIndentation(INDENT) << "The Destination ID is " << destID << std::endl;
-	file << addIndentation(INDENT) << "Arrival UDP Port is " << unsigned(arrivalPort) << std::endl;
-	file << addIndentation(INDENT) << "The Forward Port is " << unsigned(departPort) << std::endl;
+	time_t tt;
+	struct tm * ti;
+	time (&tt); 
+	ti = localtime(&tt); 
 
 
-	/* Printing the entire payload */
-	file << addIndentation(INDENT) << "The Packet Payload contains: " << std::endl;
-	for(int i = 0; i <= payLength; i++){
-		file << addIndentation(INDENT) << unsigned(pay[i]) << std::endl;
+	if (file.is_open()){
+		file << "<Routed Packet>" << std::endl;
+		file << addIndentation(INDENT) << "Time: " << asctime(ti);
+		file << addIndentation(INDENT) << "The Packet Source ID is " << d.getID() << std::endl;
+		file << addIndentation(INDENT) << "The previous hop ID is " << d.getPreviousHopID() << std::endl;	
+		file << addIndentation(INDENT) << "The Destination ID is " << d.getDestID() << std::endl;
+		file << addIndentation(INDENT) << "Arrival UDP Port is " << (int)(arrivalPort) << std::endl;
+		file << addIndentation(INDENT) << "The Forward Port is " << (int)(departPort) << std::endl;
+
+
+		if (ID == d.getDestID()){
+			/* Printing the entire payload */
+			file << addIndentation(INDENT) << "The Packet Payload contains: " << std::endl;
+			file << addIndentation(INDENT);
+			for(std::size_t i = 0; i < d.getPayload().size(); i++){
+				file << (char)(d.getPayload().at(i));
+			}
+			file << std::endl;
+		}
+		file << "</Routed Packet>" << std::endl;
+		file << std::endl;
 	}
-
-	file << "</Routed Packet>" << std::endl;
 }
 
-void logger::insertDVUpdate(struct dv_update d){
-	file << addIndentation(INDENT) << "DV update from " << d.sourceID << std::endl;
-	file << addIndentation(INDENT) << std::setw(15) << std::left << "Destination" <<
+void logger::insertDVUpdate(struct dv_update d, int indent){
+	file << addIndentation(indent / 2) << "DV update from " << d.sourceID << ":" << std::endl;
+	file << addIndentation(indent) << std::setw(15) << std::left << "Destination" <<
 			std::setw(15) << std::left << "Cost" << std::endl;
 	
 	for (std::size_t i = 0; i < d.costs.size(); i++){
 		if (d.costs.at(i) != 0xFF){
-			file << addIndentation(INDENT) << std::setw(15) << std::left << (char)(i + 65) <<
+			file << addIndentation(indent) << std::setw(15) << std::left << (char)(i + 65) <<
 					std::setw(15) << std::left << (int)d.costs.at(i) << std::endl;
 		}
 	}
@@ -92,12 +105,13 @@ void logger::recordInitialDV(distance_vector currentDV){
 	struct tm * ti;
 	time (&tt); 
 	ti = localtime(&tt); 
-	std::string time = asctime(ti);
 
+	previousDV = new distance_vector(currentDV);
 
 	if (file.is_open()){
-		file << time.substr(0, time.size() -1) << ": <Initialised DV>" << std::endl;
-		insertDVinFile(currentDV);
+		file << "<Initialised DV>" << std::endl;
+		file << addIndentation(INDENT) << "Time: " << asctime(ti);
+		insertDVinFile(currentDV, 2 * INDENT);
 
 		file << "</Initialised DV>" << std::endl;
 		file << std::endl;
@@ -111,4 +125,52 @@ std::string logger::addIndentation(int indentDepth){
 		s += " ";
 
 	return s;
+}
+
+void logger::recordRouterDropout(distance_vector currentDV, char deadID){
+	time_t tt;	//Note should probably just make this a class variable
+	struct tm * ti;
+	time (&tt); 
+	ti = localtime(&tt); 
+
+	if (file.is_open()){
+		file << "<Router Dropout>" << std::endl;
+		file << addIndentation(INDENT) << "Time: " << asctime(ti);
+		file << addIndentation(INDENT) << "Router " << deadID << " has not responded and is considered dead." << std::endl;
+
+		if (previousDV != nullptr){
+			file << addIndentation(INDENT) << "Previous DV state:" << std::endl;
+			insertDVinFile(*previousDV, 2 * INDENT);
+		}
+
+		file << addIndentation(INDENT) << "Current DV state:" << std::endl;
+		insertDVinFile(currentDV, 2 * INDENT);
+		previousDV = new distance_vector(currentDV);
+		file << "</Router Dropout>" << std::endl;
+		file << std::endl;
+	}
+}
+
+void logger::recordRouterJoin(distance_vector currentDV, char joinedID){
+	time_t tt;
+	struct tm * ti;
+	time (&tt); 
+	ti = localtime(&tt); 
+
+	if (file.is_open()){
+		file << "<Router Joined>" << std::endl;
+		file << addIndentation(INDENT) << "Time: " << asctime(ti);
+		file << addIndentation(INDENT) << "Router " << joinedID << " has connected." << std::endl;
+
+		if (previousDV != nullptr){
+			file << addIndentation(INDENT) << "Previous DV state:" << std::endl;
+			insertDVinFile(*previousDV, 2 * INDENT);
+		}
+
+		file << addIndentation(INDENT) << "Current DV state:" << std::endl;
+		insertDVinFile(currentDV, 2 * INDENT);
+		previousDV = new distance_vector(currentDV);
+		file << "</Router Joined>" << std::endl;
+		file << std::endl;
+	}
 }

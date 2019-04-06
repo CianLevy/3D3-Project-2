@@ -18,6 +18,7 @@ public:
 
   void do_receive()
   {
+    std::cout << "Receive\n";
     socket_.async_receive_from(
         boost::asio::buffer(data_, max_length), sender_endpoint_,
         [this](boost::system::error_code ec, std::size_t bytes_recvd)
@@ -35,6 +36,7 @@ public:
 
   void do_send(std::size_t length)
   {
+        std::cout << "Send\n";
     socket_.async_send_to(
         boost::asio::buffer(data_, length), sender_endpoint_,
         [this](boost::system::error_code /*ec*/, std::size_t /*bytes_sent*/)

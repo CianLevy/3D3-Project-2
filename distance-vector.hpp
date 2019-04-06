@@ -44,14 +44,14 @@ class distance_vector {
     private:
         char routerID;
         std::vector<struct link> currentDV; //The actual distance vector. Node ids correspond to their location in the vector where the current cost is stored
-        
+        std::vector<struct link> immediateNeighbours;
         struct link buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_);
         uint16_t listenPort;
         
 
     public:
         distance_vector(char ID);
-        distance_vector(const distance_vector &old);    //Copy constructor
+        distance_vector(const distance_vector &old); //Copy constructor
 
         bool updateDV(dv_update d);
         void readLinkCosts();
@@ -60,8 +60,11 @@ class distance_vector {
         void printDV();
         struct link getLink(char destID);
         void printForwardTable();
+        void removeRouter(char ID);
+        void restoreLink(char ID);
 
         std::vector<struct link> getCurrentDV(){return currentDV;};
+        std::vector<struct link> getNeighbours(){ return immediateNeighbours; };
 
         uint16_t getListenPort(){ return listenPort; };
 };

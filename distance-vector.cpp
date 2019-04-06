@@ -29,14 +29,14 @@ bool distance_vector::updateDV(dv_update d){
 
 	for (int i = 0 ; i < loopLength; i++){
 		if (currentDV.at(i).cost > currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)	//Option 1: the link is cheaper
-			|| ((currentDV.at(i).cost == currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)) && d.sourceID < currentDV.at(i).nextHopID && (d.costs).at(i) != 0xFF)){	//Option 2: the link is the same cost but router ID is lower
+			|| (currentDV.at(i).cost == currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i) && currentDV.at(CONVERTID(d.sourceID)).nextHopID < currentDV.at(i).nextHopID && (d.costs).at(i) != 0xFF)){	//Option 2: the link is the same cost but router ID is lower
 			#if DEBUG
 				std::cout << "Update from " << d.sourceID << std::endl;
 				std::cout << "Previous cost to " << (char)(i + 65) << ": " << (int)currentDV.at(i).cost << std::endl;
 				std::cout << "Updated next hop to " << d.sourceID << " with total cost: " << (int)(currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)) << std::endl;
 				std::cout << "\n";
 			#endif
-
+		
 			uint8_t previousCost = currentDV.at(i).cost;
 
 			currentDV.at(i).cost = currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i);
@@ -45,11 +45,15 @@ bool distance_vector::updateDV(dv_update d){
 			currentDV.at(i).port = currentDV.at(CONVERTID(d.sourceID)).port;
 
 			for (std::size_t j = 0 ; j < currentDV.size(); j++){
-				if (currentDV.at(j).nextHopID  == (char)(i + 65)){   //if the next hop is the router which was just updated in the new link: update the cost with the new cost
+				if (currentDV.at(j).nextHopID  == (char)(i + 65) && 
+					currentDV.at(j).cost > currentDV.at(j).cost + currentDV.at(i).cost - previousCost &&
+					d.costs.at(j) != 0xFF){   //if the next hop is the router which was just updated in the new link: update the cost with the new cost
+					
 					currentDV.at(j).cost += currentDV.at(i).cost - previousCost; //Remove the previous cost and update with the new cost
 					currentDV.at(j).nextHopID = currentDV.at(CONVERTID(d.sourceID)).nextHopID;
 					currentDV.at(j).ip = currentDV.at(CONVERTID(d.sourceID)).ip;
 					currentDV.at(j).port = currentDV.at(CONVERTID(d.sourceID)).port;
+
 
 					#if DEBUG
 						std::cout << "Previous cost to " << (char)(j + 65) << ": " << (int)previousCost << std::endl;
@@ -60,6 +64,21 @@ bool distance_vector::updateDV(dv_update d){
 			}
 			update = true;
         }
+		else if (currentDV.at(i).cost != 0xFF && 
+				currentDV.at(i).nextHopID == d.sourceID && //d.sourceID == (i + 65) && //Direct neighbour link
+				(currentDV.at(i).cost < currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)
+				|| (d.costs).at(i) == 0xFF) ){	//Option 3: a current next hop router has increased its link cost
+
+
+			//If cost is 0xFF the neighbour is offline
+			if ((d.costs).at(CONVERTID(d.sourceID)) == 0xFF){
+				currentDV.at(CONVERTID(d.sourceID)).cost = 0xFF;
+				update = true;
+			}
+			currentDV.at(i).cost = ((d.costs).at(i) == 0xFF) ? 0xFF : currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i);
+			update = true;
+
+		}
 
 	}
 	return update;
@@ -103,8 +122,12 @@ void distance_vector::readLinkCosts(){
         std::getline(infile, buffer, '\n');
         cost = std::stoi(buffer);
         
-        if (source == routerID)   //Only interested in immediate neighbours
-            (currentDV.at(CONVERTID(dest))) = buildLink(dest, ip, port, cost);
+        if (source == routerID){   //Only interested in immediate neighbours
+			struct link l = buildLink(dest, ip, port, cost);
+            (currentDV.at(CONVERTID(dest))) = l;
+			immediateNeighbours.push_back(l); 
+
+		}
 		else if (dest == routerID){
 			currentDV.at(CONVERTID(dest)).port = port;
 			listenPort = port;
@@ -159,4 +182,40 @@ void distance_vector::printForwardTable(){
                         << (int)((currentDV.at(i)).cost) <<  std::endl;
         }
     }
+}
+
+
+void distance_vector::removeRouter(char ID){
+
+	struct dv_update update;
+	update.sourceID = ID;
+
+	for (int i = 0; i < DVLENGTH; i++)
+		update.costs.push_back(0xFF);
+
+	updateDV(update);
+	
+
+	for (struct link l : immediateNeighbours){
+		//If a neighbour was not being routed to directly due to the existance of another route which no longer exists, then restore the original route
+		if (currentDV.at(CONVERTID(l.nextHopID)).nextHopID == ID && l.nextHopID != ID){
+			currentDV.at(CONVERTID(l.nextHopID)).cost = l.cost;
+			currentDV.at(CONVERTID(l.nextHopID)).ip = l.ip;
+			currentDV.at(CONVERTID(l.nextHopID)).nextHopID = l.nextHopID;
+			currentDV.at(CONVERTID(l.nextHopID)).port = l.port;
+		}
+	}
+
+}
+
+void distance_vector::restoreLink(char ID){
+	for (struct link l : immediateNeighbours){
+		if (l.nextHopID == ID){
+			currentDV.at(CONVERTID(l.nextHopID)).cost = l.cost;
+			currentDV.at(CONVERTID(l.nextHopID)).ip = l.ip;
+			currentDV.at(CONVERTID(l.nextHopID)).nextHopID = l.nextHopID;
+			currentDV.at(CONVERTID(l.nextHopID)).port = l.port;
+			break;
+		}
+	}
 }

@@ -40,15 +40,18 @@ class logger{
         std::ofstream file;
         std::ofstream fileStreamO;
         distance_vector* previousDV;
+        char ID;
 
-        void insertDVinFile(distance_vector d);
-        void insertDVUpdate(struct dv_update d);
+        void insertDVinFile(distance_vector d, int indent);
+        void insertDVUpdate(struct dv_update d, int indent);
         std::string addIndentation(int indentDepth);
 
     public:
-        logger(char ID); //When constructing the logger and opening the log, only the router ID is required to fully specify the file name
+        logger(char ID_); //When constructing the logger and opening the log, only the router ID is required to fully specify the file name
         void recordDVUpdate(distance_vector currentDV, struct dv_update cause); //All the information required to record the table update is provided by "previousTable" and currentTable
                                                         //ctime will have to be used to record the time of the update
         void recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t departPort); //The majority of the required information is stored in the datagram class
         void recordInitialDV(distance_vector currentDV);
+        void recordRouterDropout(distance_vector currentDV, char deadID);
+        void recordRouterJoin(distance_vector currentDV, char joinedID);
 };

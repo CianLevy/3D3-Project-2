@@ -1,0 +1,59 @@
+A
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          7              
+          E              E              10005          1              
+          F              E              10005          4          
+
+B
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              E              10005          3              
+          B              B              10001          0              
+          C              F              10004          2              
+          D              F              10004          4              
+          E              E              10005          2              
+          F              F              10004          1 
+
+C
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              F              10004          5              
+          B              F              10004          2              
+          C              C              10002          0              
+          D              D              10003          4              
+          E              F              10004          4              
+          F              F              10004          1   
+
+D
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              F              10004          7              
+          B              F              10004          4              
+          C              C              10002          4              
+          D              D              10003          0              
+          E              F              10004          6              
+          F              F              10004          3 
+
+E
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          1              
+          B              B              10001          2              
+          C              B              10001          4              
+          D              B              10001          6              
+          E              E              10005          0              
+          F              B              10001          3    
+
+F
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              B              10001          4              
+          B              B              10001          1              
+          C              C              10002          1              
+          D              D              10003          3              
+          E              B              10001          3              
+          F              F              10004          0   

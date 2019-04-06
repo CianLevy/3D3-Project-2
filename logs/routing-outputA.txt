@@ -1,57 +1,298 @@
-Fri Apr  5 21:47:49 2019: <Initialised DV>
-     Destination    Next router    Port           Cost           
-     A              A              10000          0              
-     B              B              10001          4              
-     E              E              10005          1              
+<Initialised DV>
+     Time: Sat Apr  6 18:48:36 2019
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              B              10001          4              
+          E              E              10005          1              
+
 </Initialised DV>
 
 <DV Update>
-     Time: Fri Apr  5 21:47:52 2019
-     DV update from E
-     Destination    Cost           
-     A              1              
-     B              2              
-     C              4              
-     D              6              
-     E              0              
-     F              3              
+     Time: Sat Apr  6 18:48:39 2019
+     DV update from B:
+          Destination    Cost           
+          A              4              
+          B              0              
+          C              2              
+          E              5              
+          F              1              
 
-     Current DV state
-     Destination    Next router    Port           Cost           
-     A              A              10000          0              
-     B              E              10005          3              
-     C              E              10005          5              
-     D              E              10005          7              
-     E              E              10005          1              
-     F              E              10005          4              
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              B              10001          4              
+          E              E              10005          1              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              B              10001          4              
+          C              B              10001          6              
+          E              E              10005          1              
+          F              B              10001          5              
+
 </DV Update>
 
 <DV Update>
-     Time: Fri Apr  5 21:47:53 2019
-     DV update from B
-     Destination    Cost           
-     A              4              
-     B              0              
-     C              2              
-     D              4              
-     E              2              
-     F              1              
+     Time: Sat Apr  6 18:48:39 2019
+     DV update from E:
+          Destination    Cost           
+          A              1              
+          B              2              
+          C              7              
+          E              0              
+          F              3              
 
      Previous DV state:
-     Destination    Next router    Port           Cost           
-     A              A              10000          0              
-     B              E              10005          3              
-     C              E              10005          5              
-     D              E              10005          7              
-     E              E              10005          1              
-     F              E              10005          4              
-     Current DV state
-     Destination    Next router    Port           Cost           
-     A              A              10000          0              
-     B              E              10005          3              
-     C              E              10005          5              
-     D              E              10005          7              
-     E              E              10005          1              
-     F              E              10005          4              
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              B              10001          4              
+          C              B              10001          6              
+          E              E              10005          1              
+          F              B              10001          5              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          8              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:48:39 2019
+     DV update from B:
+          Destination    Cost           
+          A              3              
+          B              0              
+          C              2              
+          E              2              
+          F              1              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          8              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:48:39 2019
+     DV update from E:
+          Destination    Cost           
+          A              1              
+          B              2              
+          C              9              
+          E              0              
+          F              3              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          10             
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:48:39 2019
+     DV update from E:
+          Destination    Cost           
+          A              1              
+          B              2              
+          C              4              
+          E              0              
+          F              3              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          10             
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:48:41 2019
+     DV update from B:
+          Destination    Cost           
+          A              3              
+          B              0              
+          C              2              
+          D              6              
+          E              2              
+          F              1              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          9              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:48:43 2019
+     DV update from B:
+          Destination    Cost           
+          A              3              
+          B              0              
+          C              2              
+          D              4              
+          E              2              
+          F              1              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          9              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          7              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:49:01 2019
+     DV update from E:
+          Destination    Cost           
+          A              1              
+          B              2              
+          C              4              
+          E              0              
+          F              3              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          7              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:49:08 2019
+     DV update from B:
+          Destination    Cost           
+          A              3              
+          B              0              
+          C              2              
+          D              6              
+          E              2              
+          F              1              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          9              
+          E              E              10005          1              
+          F              E              10005          4              
+
+</DV Update>
+
+<DV Update>
+     Time: Sat Apr  6 18:49:10 2019
+     DV update from B:
+          Destination    Cost           
+          A              3              
+          B              0              
+          C              2              
+          D              4              
+          E              2              
+          F              1              
+
+     Previous DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          9              
+          E              E              10005          1              
+          F              E              10005          4              
+
+     Current DV state:
+          Destination    Next router    Port           Cost           
+          A              A              10000          0              
+          B              E              10005          3              
+          C              E              10005          5              
+          D              E              10005          7              
+          E              E              10005          1              
+          F              E              10005          4              
+
 </DV Update>
 
