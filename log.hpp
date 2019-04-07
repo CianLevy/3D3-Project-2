@@ -37,10 +37,10 @@
 
 class logger{
     private:
-        std::ofstream file;
-        std::ofstream fileStreamO;
-        distance_vector* previousDV;
-        char ID;
+        std::ofstream       file;
+        std::ofstream       fileStreamO;
+        distance_vector*    previousDV;
+        char                ID;
 
         void insertDVinFile(distance_vector d, int indent);
         void insertDVUpdate(struct dv_update d, int indent);

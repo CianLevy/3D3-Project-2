@@ -42,3 +42,7 @@ std::vector<uint8_t> datagram::buildDatagram(){
     d.insert(d.end(), payload.begin(), payload.end());
     return d;
 }
+
+datagram::~datagram(){
+    payload.clear();
+}

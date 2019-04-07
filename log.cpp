@@ -65,16 +65,16 @@ void logger::recordRoutedDatagram(datagram d, uint16_t arrivalPort, uint16_t dep
 	if (file.is_open()){
 		file << "<Routed Packet>" << std::endl;
 		file << addIndentation(INDENT) << "Time: " << asctime(ti);
-		file << addIndentation(INDENT) << "The Packet Source ID is " << d.getID() << std::endl;
-		file << addIndentation(INDENT) << "The previous hop ID is " << d.getPreviousHopID() << std::endl;	
-		file << addIndentation(INDENT) << "The Destination ID is " << d.getDestID() << std::endl;
-		file << addIndentation(INDENT) << "Arrival UDP Port is " << (int)(arrivalPort) << std::endl;
-		file << addIndentation(INDENT) << "The Forward Port is " << (int)(departPort) << std::endl;
+		file << addIndentation(INDENT) << "Datagram Source ID: " << d.getID() << std::endl;
+		file << addIndentation(INDENT) << "Previous hop ID: " << d.getPreviousHopID() << std::endl;	
+		file << addIndentation(INDENT) << "Destination ID:" << d.getDestID() << std::endl;
+		file << addIndentation(INDENT) << "Arrival Port: " << (int)(arrivalPort) << std::endl;
+		file << addIndentation(INDENT) << "Departing Port: " << (int)(departPort) << std::endl;
 
 
 		if (ID == d.getDestID()){
 			/* Printing the entire payload */
-			file << addIndentation(INDENT) << "The Packet Payload contains: " << std::endl;
+			file << addIndentation(INDENT) << "Payload contents: " << std::endl;
 			file << addIndentation(INDENT);
 			for(std::size_t i = 0; i < d.getPayload().size(); i++){
 				file << (char)(d.getPayload().at(i));

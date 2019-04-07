@@ -20,10 +20,10 @@
 class datagram{
 
     public:
-        //To do: add "previous hop" to header for debug purposes
         enum type {data, control};
         datagram(type t_, char sourceID_, char destID_, char previousHopID_, std::vector<uint8_t> payload_);
         datagram(std::vector<uint8_t> d, uint8_t length_); //Demultiplex a received datagram and extract its payload
+        ~datagram();
 
         std::vector<uint8_t> buildDatagram();
 
@@ -31,17 +31,19 @@ class datagram{
         char getType() { return t; };
         char getID() { return sourceID; };
         uint8_t getLength() { return length; };
+        
         void setDestID(char destID_){ destID = destID_;};
         char getDestID() { return destID; };
+
         char getPreviousHopID(){ return previousHopID; };
         void setPreviousHopID(char previousHopID_){ previousHopID =  previousHopID_; };
 
     private:
-        std::vector<uint8_t> payload;
-        type t;
-        char sourceID;
-        char destID;
-        char previousHopID;
-        uint8_t length;
+        std::vector<uint8_t>            payload;
+        type                            t;
+        char                            sourceID;
+        char                            destID;
+        char                            previousHopID;
+        uint8_t                         length;
 
 };

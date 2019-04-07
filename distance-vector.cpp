@@ -1,7 +1,7 @@
 #include "distance-vector.hpp"
 
 using namespace std;
-distance_vector::distance_vector(char ID){
+distance_vector::distance_vector(char ID, std::string topologyCSV){
 	routerID = ID;
 
 	for (int i = 0; i < DVLENGTH; i++){
@@ -12,7 +12,7 @@ distance_vector::distance_vector(char ID){
 			l = buildLink(0xFF, "127.0.0.1", 0xFFFF, 0xFF); //Initialise as a flagged null link
         currentDV.push_back(l);
     }
-	readLinkCosts();
+	readLinkCosts(topologyCSV);
 }
 
 distance_vector::distance_vector(const distance_vector &old){
@@ -23,7 +23,6 @@ distance_vector::distance_vector(const distance_vector &old){
 }
 
 bool distance_vector::updateDV(dv_update d){
-	//To do: handle link cost increases and router drop out
 	bool update = false;
 	int loopLength = (d.costs.size() < currentDV.size()) ? d.costs.size() : currentDV.size();
 
@@ -97,12 +96,12 @@ void distance_vector::printDV(){
     }
 }
 
-void distance_vector::readLinkCosts(){
+void distance_vector::readLinkCosts(std::string topologyCSV){
     
     std::ifstream infile;
-	infile.open(INITIAL_LINKS);
+	infile.open(topologyCSV);
 	if (!infile) {
-		std::cerr << "Error opening 'links.csv'";
+		std::cerr << "Error opening topology csv\n";
 		exit(1);   
 	}
     
@@ -182,6 +181,7 @@ void distance_vector::printForwardTable(){
                         << (int)((currentDV.at(i)).cost) <<  std::endl;
         }
     }
+	std::cout << std::endl;
 }
 
 
@@ -218,4 +218,9 @@ void distance_vector::restoreLink(char ID){
 			break;
 		}
 	}
+}
+
+distance_vector::~distance_vector(){
+	currentDV.clear();
+	immediateNeighbours.clear();
 }

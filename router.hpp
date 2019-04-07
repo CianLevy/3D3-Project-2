@@ -10,7 +10,7 @@
 #include "log.cpp"
 
 #define BUFFERLENGTH 1000
-#define DEBUG false
+#define DEBUG 0
 #define MAXCONNECTIONS 26
 #define REFRESHPERIOD 3 //Defines how frequently the distance vector is advertised
 #define DROP_OUT_PERIOD_COUNT 2 //Number of consecutive periods without receiving an update from a neighbour required for the neighbour to be considered 'dead'
@@ -27,12 +27,10 @@ using boost::asio::ip::udp;
 class router{
     private:
         //To do: reformat and simplify. Use initialisation lists instead of pointers
-        distance_vector*                    dv;
-        logger*                             l;
+       
         udp::socket*                        socket_;
         udp::endpoint                       server_endpoint;
         std::vector<uint8_t>                buffer;
-        router*                             r;
         bool                                stop;
         boost::asio::io_context             io_context;
         char                                routerID;
@@ -41,13 +39,19 @@ class router{
         std::vector<uint8_t>                timeSinceReceived;
         std::vector<bool>                   live;
         boost::asio::deadline_timer         timer;
+        logger*                             log;
+        distance_vector                     dv;
+        
         void periodicRetransmit();
+        void receive();
+        void forwardDatagram(datagram d); //Forward the datagram to the correct link based on the values in the table
+        void broadcast(bool control, std::vector<uint8_t> payload); //Function to send a datagram to all of router's immediate neighbours
 
     public:
-        void forwardDatagram(datagram d); //Forward the datagram to the correct link based on the values in the table
+        router(char ID, bool mode, std::string topologyCSV); //Initialise the router with a specified id
+        ~router();
+
         void singleSend(datagram d); //Send a single datagram and close the server
-        void receive();
-        router(char ID, bool mode); //Initialise the router with a specified id
         void run(); //Launch the router and wait for connections
-        void broadcast(bool control, std::vector<uint8_t> payload); //Function to send a datagram to all of router's immediate neighbours
+        void close();
 };

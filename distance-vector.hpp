@@ -14,7 +14,6 @@
 #include <vector>
 
 #define DVLENGTH 26 //26 characters in the alphabet
-#define INITIAL_LINKS "resources/links.csv"
 #define CONVERTID(id) (id - 65) //IDs are capital letters and must be mapped to ints starting from 0
 #define DEBUG false
 
@@ -29,32 +28,34 @@
 */
 struct link
  {
-    char nextHopID; //ID of the router the link connects to
-    std::string ip; //Link router's IP
-    uint16_t port; //Link router's listening port
-    uint8_t cost; //Link cost 
+    char            nextHopID; //ID of the router the link connects to
+    std::string     ip; //Link router's IP
+    uint16_t        port; //Link router's listening port
+    uint8_t         cost; //Link cost 
 };
 
 struct dv_update{
-    char sourceID;
-    std::vector<uint8_t> costs;
+    char                    sourceID;
+    std::vector<uint8_t>    costs;
 };
 
 class distance_vector {
     private:
-        char routerID;
-        std::vector<struct link> currentDV; //The actual distance vector. Node ids correspond to their location in the vector where the current cost is stored
-        std::vector<struct link> immediateNeighbours;
-        struct link buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_);
-        uint16_t listenPort;
-        
+        char                            routerID;
+        std::vector<struct link>        currentDV; //The actual distance vector. Node ids correspond to their location in the vector where the current cost is stored
+        std::vector<struct link>        immediateNeighbours;
+        uint16_t                        listenPort;
 
+
+        struct link buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_);
+    
     public:
-        distance_vector(char ID);
+        distance_vector(char ID, std::string topologyCSV);
         distance_vector(const distance_vector &old); //Copy constructor
+        ~distance_vector();
 
         bool updateDV(dv_update d);
-        void readLinkCosts();
+        void readLinkCosts(std::string topologyCSV);
         struct dv_update buildDVUpdate(std::vector<uint8_t> buffer);
         std::vector<uint8_t> getDVUpdate();
         void printDV();
