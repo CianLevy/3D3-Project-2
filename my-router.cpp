@@ -87,6 +87,7 @@ void launchRouter(char ID, std::string topologyCSV){
 }
 
 void generateTraffic(char sourceID, char destID, std::string topologyCSV){
+    std::cout << "Sending traffic from " << sourceID << " to " << destID << std::endl;
     std::string p = "Example payload";
     std::vector<uint8_t> payload(p.begin(), p.end());
 

@@ -1,5 +1,5 @@
 <Initialised DV>
-     Time: Mon Apr  8 12:44:01 2019
+     Time: Mon Apr  8 17:20:12 2019
           Destination    Next router    Port           Cost           
           A              A              10000          4              
           B              B              10001          0              
@@ -10,7 +10,7 @@
 </Initialised DV>
 
 <DV Update>
-     Time: Mon Apr  8 12:44:04 2019
+     Time: Mon Apr  8 17:20:15 2019
      DV update from C:
           Destination    Cost           
           A              7              
@@ -40,14 +40,15 @@
 </DV Update>
 
 <DV Update>
-     Time: Mon Apr  8 12:44:04 2019
-     DV update from E:
+     Time: Mon Apr  8 17:20:15 2019
+     DV update from F:
           Destination    Cost           
-          A              1              
-          B              2              
-          C              5              
-          E              0              
-          F              3              
+          A              5              
+          B              1              
+          C              1              
+          D              3              
+          E              3              
+          F              0              
 
      Previous DV state:
           Destination    Next router    Port           Cost           
@@ -60,32 +61,32 @@
 
      Current DV state:
           Destination    Next router    Port           Cost           
-          A              E              10005          3              
+          A              A              10000          4              
           B              B              10001          0              
-          C              C              10002          3              
-          D              C              10002          7              
+          C              F              10004          2              
+          D              F              10004          4              
           E              E              10005          2              
           F              F              10004          1              
 
 </DV Update>
 
 <DV Update>
-     Time: Mon Apr  8 12:44:04 2019
-     DV update from F:
+     Time: Mon Apr  8 17:20:17 2019
+     DV update from E:
           Destination    Cost           
-          A              5              
-          B              1              
-          C              1              
-          D              3              
-          E              3              
-          F              0              
+          A              1              
+          B              2              
+          C              4              
+          D              6              
+          E              0              
+          F              3              
 
      Previous DV state:
           Destination    Next router    Port           Cost           
-          A              E              10005          3              
+          A              A              10000          4              
           B              B              10001          0              
-          C              C              10002          3              
-          D              C              10002          7              
+          C              F              10004          2              
+          D              F              10004          4              
           E              E              10005          2              
           F              F              10004          1              
 
@@ -101,163 +102,7 @@
 </DV Update>
 
 <Router Dropout>
-     Time: Mon Apr  8 12:44:22 2019
-     Router E has not responded and is considered dead.
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          4              
-          E              E              10005          2              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          4              
-          F              F              10004          1              
-
-</Router Dropout>
-
-<DV Update>
-     Time: Mon Apr  8 12:44:47 2019
-     DV update from F:
-          Destination    Cost           
-          A              5              
-          B              1              
-          C              1              
-          F              0              
-
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          4              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          F              F              10004          1              
-
-</DV Update>
-
-<Router Joined>
-     Time: Mon Apr  8 12:45:05 2019
-     Router E has connected.
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          E              E              10005          2              
-          F              F              10004          1              
-
-</Router Joined>
-
-<DV Update>
-     Time: Mon Apr  8 12:45:05 2019
-     DV update from E:
-          Destination    Cost           
-          A              1              
-          B              2              
-          E              0              
-          F              3              
-
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              A              10000          4              
-          B              B              10001          0              
-          C              F              10004          2              
-          E              E              10005          2              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          E              E              10005          2              
-          F              F              10004          1              
-
-</DV Update>
-
-<DV Update>
-     Time: Mon Apr  8 12:45:23 2019
-     DV update from C:
-          Destination    Cost           
-          A              5              
-          B              2              
-          C              0              
-          D              4              
-          E              4              
-          F              1              
-
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          E              E              10005          2              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          6              
-          E              E              10005          2              
-          F              F              10004          1              
-
-</DV Update>
-
-<DV Update>
-     Time: Mon Apr  8 12:45:23 2019
-     DV update from F:
-          Destination    Cost           
-          A              4              
-          B              1              
-          C              1              
-          D              3              
-          E              3              
-          F              0              
-
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          6              
-          E              E              10005          2              
-          F              F              10004          1              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              E              10005          3              
-          B              B              10001          0              
-          C              F              10004          2              
-          D              F              10004          4              
-          E              E              10005          2              
-          F              F              10004          1              
-
-</DV Update>
-
-<Router Dropout>
-     Time: Mon Apr  8 12:45:49 2019
+     Time: Mon Apr  8 17:20:30 2019
      Router E has not responded and is considered dead.
      Previous DV state:
           Destination    Next router    Port           Cost           
@@ -279,7 +124,7 @@
 </Router Dropout>
 
 <Router Joined>
-     Time: Mon Apr  8 12:45:57 2019
+     Time: Mon Apr  8 17:20:48 2019
      Router E has connected.
      Previous DV state:
           Destination    Next router    Port           Cost           
@@ -301,7 +146,7 @@
 </Router Joined>
 
 <DV Update>
-     Time: Mon Apr  8 12:45:57 2019
+     Time: Mon Apr  8 17:20:48 2019
      DV update from E:
           Destination    Cost           
           A              1              
@@ -328,4 +173,31 @@
           F              F              10004          1              
 
 </DV Update>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:30 2019
+     Datagram Source ID: Z
+     Previous hop ID: E
+     Destination ID:D
+     Arrival Port: 10001
+     Departing Port: 10004
+</Routed Packet>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:39 2019
+     Datagram Source ID: Z
+     Previous hop ID: F
+     Destination ID:A
+     Arrival Port: 10001
+     Departing Port: 10005
+</Routed Packet>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:46 2019
+     Datagram Source ID: Z
+     Previous hop ID: F
+     Destination ID:A
+     Arrival Port: 10001
+     Departing Port: 10005
+</Routed Packet>
 

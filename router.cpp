@@ -53,12 +53,16 @@ void router::periodicRetransmit(){
             timeSinceReceived.at(i)++;
             
             if (timeSinceReceived.at(i) > DROP_OUT_PERIOD_COUNT && dv.getNeighbours().at(i).live){   //The neighbour has not provided an update within the required period and is now considered dead
+                #if DEBUG == 3
+                    std::system("clear");
+                #endif
+
                 std::cout << "Router " << dv.getNeighbours().at(i).ID << " has not responded for " << DROP_OUT_PERIOD_COUNT * REFRESHPERIOD << " seconds and is now considered dead." << std::endl;
                 dv.setNeighbourLiveness(false, dv.getNeighbours().at(i).ID);
                 dv.removeRouter(dv.getNeighbours().at(i).ID);
                 log->recordRouterDropout(dv, dv.getNeighbours().at(i).ID);
 
-                #if DEBUG == 1
+                #if DEBUG == 1 || DEBUG == 3
                     dv.printForwardTable();
                 #endif 
             }
@@ -101,7 +105,8 @@ void router::receive(){
       
                     //Check if the datagram is a DV update or packet to route
                     if (d.getType() == datagram::control){   //DV update
-
+                        
+                        bool cleared = false;
                         //Loop through neighbours to determine which one was the source and reset the receive time count
                         int i = 0;
                         for (struct neighbour n : dv.getNeighbours()){
@@ -109,6 +114,11 @@ void router::receive(){
                                 timeSinceReceived.at(i) = 0; //Reset the time since communication with the router
                                
                                 if (!n.live){   //If the router was not alive the dv must be reset to the original link cost
+                                    #if DEBUG == 3
+                                        std::system("clear");
+                                    #endif
+
+                                    cleared = true;
                                     std::cout << "Router " << d.getID() << " joined" << std::endl;
                                     dv.restoreLink(d.getID()); 
                                     log->recordRouterJoin(dv, d.getID());                
@@ -120,7 +130,10 @@ void router::receive(){
           
                         struct dv_update update = dv.buildDVUpdate(d.getPayload());
                         if (dv.updateDV(update)){
-                            #if DEBUG == 1
+                            #if DEBUG == 1 || DEBUG == 3
+                                if (!cleared && DEBUG == 3)
+                                    std::system("clear");
+
                                 dv.printForwardTable();
                             #endif
                             std::cout << "DV update caused by router " << d.getID() << std::endl;

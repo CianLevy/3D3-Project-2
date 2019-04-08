@@ -10,7 +10,7 @@
 #include "log.cpp"
 
 #define BUFFERLENGTH 1000
-#define DEBUG 1
+#define DEBUG 3
 #define MAXCONNECTIONS 26
 #define REFRESHPERIOD 3 //Defines how frequently the distance vector is advertised
 #define DROP_OUT_PERIOD_COUNT 2 //Number of consecutive periods without receiving an update from a neighbour required for the neighbour to be considered 'dead'

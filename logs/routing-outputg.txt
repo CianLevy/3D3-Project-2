@@ -1,0 +1,6 @@
+<Initialised DV>
+     Time: Mon Apr  8 14:42:24 2019
+          Destination    Next router    Port           Cost           
+
+</Initialised DV>
+

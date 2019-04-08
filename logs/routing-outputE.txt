@@ -1,5 +1,5 @@
 <Initialised DV>
-     Time: Mon Apr  8 12:45:54 2019
+     Time: Mon Apr  8 17:20:45 2019
           Destination    Next router    Port           Cost           
           A              A              10000          1              
           B              B              10001          2              
@@ -9,7 +9,7 @@
 </Initialised DV>
 
 <DV Update>
-     Time: Mon Apr  8 12:45:57 2019
+     Time: Mon Apr  8 17:20:48 2019
      DV update from A:
           Destination    Cost           
           A              0              
@@ -38,7 +38,7 @@
 </DV Update>
 
 <DV Update>
-     Time: Mon Apr  8 12:45:58 2019
+     Time: Mon Apr  8 17:20:48 2019
      DV update from F:
           Destination    Cost           
           A              4              
@@ -69,7 +69,7 @@
 </DV Update>
 
 <DV Update>
-     Time: Mon Apr  8 12:45:58 2019
+     Time: Mon Apr  8 17:20:48 2019
      DV update from B:
           Destination    Cost           
           A              3              
@@ -98,4 +98,31 @@
           F              B              10001          3              
 
 </DV Update>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:30 2019
+     Datagram Source ID: Z
+     Previous hop ID: A
+     Destination ID:D
+     Arrival Port: 10005
+     Departing Port: 10001
+</Routed Packet>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:39 2019
+     Datagram Source ID: Z
+     Previous hop ID: B
+     Destination ID:A
+     Arrival Port: 10005
+     Departing Port: 10000
+</Routed Packet>
+
+<Routed Packet>
+     Time: Mon Apr  8 17:21:46 2019
+     Datagram Source ID: Z
+     Previous hop ID: B
+     Destination ID:A
+     Arrival Port: 10005
+     Departing Port: 10000
+</Routed Packet>
 
