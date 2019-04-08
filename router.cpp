@@ -19,11 +19,14 @@ router::router(char ID, bool mode, std::string topologyCSV) :
     buffer.resize(BUFFERLENGTH);
     routerID = ID;    
 
-    #if DEBUG == 1
-        dv.printForwardTable();
-    #endif
+
 
     if (!mode){
+
+        #if DEBUG == 1
+            dv.printForwardTable();
+        #endif
+
         socket_ = new udp::socket(io_context, udp::endpoint(udp::v4(), dv.getListenPort()));
         log = new logger(ID);
         log->recordInitialDV(dv);
@@ -36,8 +39,10 @@ router::router(char ID, bool mode, std::string topologyCSV) :
         
         timer.async_wait(boost::bind(&router::periodicRetransmit,  this));
     }
-    else
+    else{
+        log = nullptr;
         socket_ = new udp::socket(io_context, udp::endpoint(udp::v4(), 15000));
+    }
 
 }
 
@@ -115,13 +120,14 @@ void router::receive(){
           
                         struct dv_update update = dv.buildDVUpdate(d.getPayload());
                         if (dv.updateDV(update)){
+                            #if DEBUG == 1
+                                dv.printForwardTable();
+                            #endif
                             std::cout << "DV update caused by router " << d.getID() << std::endl;
                             log->recordDVUpdate(dv, update);
                             broadcast(1, dv.getDVUpdate());
                             
-                            #if DEBUG == 1
-                                dv.printForwardTable();
-                            #endif
+
                         }
       
                     }
@@ -176,8 +182,9 @@ void router::close(){
 router::~router(){
     socket_->close();
     delete socket_;
-
-    delete log;
+    
+    if (log)
+        delete log;
 
     buffer.resize(0);
     timeSinceReceived.resize(0);

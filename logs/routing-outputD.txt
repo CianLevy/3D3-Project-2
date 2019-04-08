@@ -1,5 +1,5 @@
 <Initialised DV>
-     Time: Sun Apr  7 16:56:04 2019
+     Time: Mon Apr  8 12:45:19 2019
           Destination    Next router    Port           Cost           
           C              C              10002          4              
           D              D              10003          0              
@@ -8,14 +8,14 @@
 </Initialised DV>
 
 <DV Update>
-     Time: Sun Apr  7 16:56:06 2019
+     Time: Mon Apr  8 12:45:23 2019
      DV update from C:
           Destination    Cost           
-          A              7              
-          B              3              
+          A              5              
+          B              2              
           C              0              
           D              4              
-          E              5              
+          E              4              
           F              1              
 
      Previous DV state:
@@ -26,48 +26,17 @@
 
      Current DV state:
           Destination    Next router    Port           Cost           
-          A              C              10002          11             
-          B              C              10002          7              
+          A              C              10002          9              
+          B              C              10002          6              
           C              C              10002          4              
           D              D              10003          0              
-          E              C              10002          9              
+          E              C              10002          8              
           F              F              10004          3              
 
 </DV Update>
 
 <DV Update>
-     Time: Sun Apr  7 16:56:06 2019
-     DV update from F:
-          Destination    Cost           
-          A              5              
-          B              1              
-          C              1              
-          D              3              
-          E              3              
-          F              0              
-
-     Previous DV state:
-          Destination    Next router    Port           Cost           
-          A              C              10002          11             
-          B              C              10002          7              
-          C              C              10002          4              
-          D              D              10003          0              
-          E              C              10002          9              
-          F              F              10004          3              
-
-     Current DV state:
-          Destination    Next router    Port           Cost           
-          A              F              10004          8              
-          B              F              10004          4              
-          C              C              10002          4              
-          D              D              10003          0              
-          E              F              10004          6              
-          F              F              10004          3              
-
-</DV Update>
-
-<DV Update>
-     Time: Sun Apr  7 16:56:06 2019
+     Time: Mon Apr  8 12:45:23 2019
      DV update from F:
           Destination    Cost           
           A              4              
@@ -79,11 +48,11 @@
 
      Previous DV state:
           Destination    Next router    Port           Cost           
-          A              F              10004          8              
-          B              F              10004          4              
+          A              C              10002          9              
+          B              C              10002          6              
           C              C              10002          4              
           D              D              10003          0              
-          E              F              10004          6              
+          E              C              10002          8              
           F              F              10004          3              
 
      Current DV state:
@@ -98,14 +67,13 @@
 </DV Update>
 
 <DV Update>
-     Time: Sun Apr  7 16:56:06 2019
+     Time: Mon Apr  8 12:45:49 2019
      DV update from F:
           Destination    Cost           
           A              5              
           B              1              
           C              1              
           D              3              
-          E              3              
           F              0              
 
      Previous DV state:
@@ -123,13 +91,12 @@
           B              F              10004          4              
           C              C              10002          4              
           D              D              10003          0              
-          E              F              10004          6              
           F              F              10004          3              
 
 </DV Update>
 
 <DV Update>
-     Time: Sun Apr  7 16:56:06 2019
+     Time: Mon Apr  8 12:45:57 2019
      DV update from F:
           Destination    Cost           
           A              4              
@@ -145,7 +112,6 @@
           B              F              10004          4              
           C              C              10002          4              
           D              D              10003          0              
-          E              F              10004          6              
           F              F              10004          3              
 
      Current DV state:

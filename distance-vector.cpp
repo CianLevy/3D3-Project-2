@@ -84,6 +84,7 @@ bool distance_vector::updateDV(dv_update d){
 }
 
 void distance_vector::printDV(){
+
 	std::cout << "Distance vector for router " << routerID << std::endl;
     std::cout <<  std::setw(15) << std::left << "Destination" << std::setw(15) << std::left <<  
     "Cost" <<  std::endl;
@@ -181,6 +182,7 @@ std::vector<uint8_t> distance_vector::getDVUpdate(){
 }
 
 void distance_vector::printForwardTable(){
+	std::system("clear");
     std::cout << "Forward table for " << routerID << std::endl;
     std::cout <<  std::setw(15) << std::left << "Destination" << std::setw(15) << std::left <<  
     "Next router" << std::setw(15) << std::left << "Port" <<
