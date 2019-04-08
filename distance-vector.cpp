@@ -27,7 +27,7 @@ bool distance_vector::updateDV(dv_update d){
 	int loopLength = (d.costs.size() < currentDV.size()) ? d.costs.size() : currentDV.size();
 
 	for (int i = 0 ; i < loopLength; i++){
-		if (currentDV.at(i).cost > currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)	//Option 1: the link is cheaper
+		if ((currentDV.at(i).cost > currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i)) //&& currentDV.at(i).cost != 0xFF) 	//Option 1: the link is cheaper
 			|| (currentDV.at(i).cost == currentDV.at(CONVERTID(d.sourceID)).cost + (d.costs).at(i) && currentDV.at(CONVERTID(d.sourceID)).nextHopID < currentDV.at(i).nextHopID && (d.costs).at(i) != 0xFF)){	//Option 2: the link is the same cost but router ID is lower
 			#if DEBUG
 				std::cout << "Update from " << d.sourceID << std::endl;
@@ -123,11 +123,14 @@ void distance_vector::readLinkCosts(std::string topologyCSV){
         
         if (source == routerID){   //Only interested in immediate neighbours
 			struct link l = buildLink(dest, ip, port, cost);
+			struct neighbour n = buildNeighbour(dest, ip, port, cost, true);
             (currentDV.at(CONVERTID(dest))) = l;
-			immediateNeighbours.push_back(l); 
+			immediateNeighbours.push_back(n);
+			//liveNeighbours.push_back(true);	//Assume all neighbours are live to begin with 
 
 		}
 		else if (dest == routerID){
+			//liveNeighbours.push_back(false);
 			currentDV.at(CONVERTID(dest)).port = port;
 			listenPort = port;
 		}
@@ -142,6 +145,16 @@ struct link distance_vector::buildLink(char routerID_, std::string ip_, uint16_t
     l.port = port_;
     l.cost = cost_;
     return l;
+}
+
+struct neighbour distance_vector::buildNeighbour(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_, bool live_){
+	struct neighbour n;
+	n.ID = routerID_;
+	n.ip = ip_;
+	n.port = port_;
+	n.cost = cost_;
+	n.live = live_;
+	return n;
 }
 
 struct link distance_vector::getLink(char destID){
@@ -196,29 +209,38 @@ void distance_vector::removeRouter(char ID){
 	updateDV(update);
 	
 
-	for (struct link l : immediateNeighbours){
+	for (struct neighbour n : immediateNeighbours){
 		//If a neighbour was not being routed to directly due to the existance of another route which no longer exists, then restore the original route
-		if (currentDV.at(CONVERTID(l.nextHopID)).nextHopID == ID && l.nextHopID != ID){
-			currentDV.at(CONVERTID(l.nextHopID)).cost = l.cost;
-			currentDV.at(CONVERTID(l.nextHopID)).ip = l.ip;
-			currentDV.at(CONVERTID(l.nextHopID)).nextHopID = l.nextHopID;
-			currentDV.at(CONVERTID(l.nextHopID)).port = l.port;
+		if (currentDV.at(CONVERTID(n.ID)).nextHopID == ID && n.ID != ID && n.live){//
+			currentDV.at(CONVERTID(n.ID)).cost = n.cost;
+			currentDV.at(CONVERTID(n.ID)).ip = n.ip;
+			currentDV.at(CONVERTID(n.ID)).nextHopID = n.ID;
+			currentDV.at(CONVERTID(n.ID)).port = n.port;
 		}
 	}
 
 }
 
 void distance_vector::restoreLink(char ID){
-	for (struct link l : immediateNeighbours){
-		if (l.nextHopID == ID){
-			currentDV.at(CONVERTID(l.nextHopID)).cost = l.cost;
-			currentDV.at(CONVERTID(l.nextHopID)).ip = l.ip;
-			currentDV.at(CONVERTID(l.nextHopID)).nextHopID = l.nextHopID;
-			currentDV.at(CONVERTID(l.nextHopID)).port = l.port;
+	for (struct neighbour n : immediateNeighbours){
+		if (n.ID == ID){
+			currentDV.at(CONVERTID(n.ID)).cost = n.cost;
+			currentDV.at(CONVERTID(n.ID)).ip = n.ip;
+			currentDV.at(CONVERTID(n.ID)).nextHopID = n.ID;
+			currentDV.at(CONVERTID(n.ID)).port = n.port;
+			setNeighbourLiveness(true, n.ID);
 			break;
 		}
 	}
 }
+
+void distance_vector::setNeighbourLiveness(bool live_, char ID){
+	for (std::size_t i = 0; i < immediateNeighbours.size(); i++){
+		if (immediateNeighbours.at(i).ID == ID)
+			immediateNeighbours.at(i).live = live_;
+	}
+}
+
 
 distance_vector::~distance_vector(){
 	currentDV.clear();

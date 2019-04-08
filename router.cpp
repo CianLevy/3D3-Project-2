@@ -31,20 +31,13 @@ router::router(char ID, bool mode, std::string topologyCSV) :
         //Extract the list of immediate neighbours before the distance vector is changed by received updates
         for (std::size_t i = 0; i < dv.getCurrentDV().size(); i++)
             if (dv.getLink(i + 65).nextHopID == (char)(i + 65) && dv.getLink(i + 65).nextHopID != routerID){
-                timeSinceReceived.push_back(0);
-                live.push_back(true);   //Assume all routers are live until proven otherwise
-                
-                if ((char)(i + 65) == routerID)
-                    live.at(i) = false;
-                
+                timeSinceReceived.push_back(0);    
             }
         
         timer.async_wait(boost::bind(&router::periodicRetransmit,  this));
     }
     else
         socket_ = new udp::socket(io_context, udp::endpoint(udp::v4(), 15000));
-    
-    
 
 }
 
@@ -54,11 +47,15 @@ void router::periodicRetransmit(){
         for (std::size_t i = 0; i < timeSinceReceived.size(); i++){
             timeSinceReceived.at(i)++;
             
-            if (timeSinceReceived.at(i) > DROP_OUT_PERIOD_COUNT && live.at(i)){   //The neighbour has not provided an update within the required period and is now considered dead
-                std::cout << "Router " << dv.getNeighbours().at(i).nextHopID << " has not responded for " << DROP_OUT_PERIOD_COUNT * REFRESHPERIOD << " seconds and is now considered dead." << std::endl;
-                live.at(i) = false;
-                dv.removeRouter(dv.getNeighbours().at(i).nextHopID);
-                log->recordRouterDropout(dv, dv.getNeighbours().at(i).nextHopID); 
+            if (timeSinceReceived.at(i) > DROP_OUT_PERIOD_COUNT && dv.getNeighbours().at(i).live){   //The neighbour has not provided an update within the required period and is now considered dead
+                std::cout << "Router " << dv.getNeighbours().at(i).ID << " has not responded for " << DROP_OUT_PERIOD_COUNT * REFRESHPERIOD << " seconds and is now considered dead." << std::endl;
+                dv.setNeighbourLiveness(false, dv.getNeighbours().at(i).ID);
+                dv.removeRouter(dv.getNeighbours().at(i).ID);
+                log->recordRouterDropout(dv, dv.getNeighbours().at(i).ID);
+
+                #if DEBUG == 1
+                    dv.printForwardTable();
+                #endif 
             }
         }
             
@@ -101,18 +98,19 @@ void router::receive(){
                     if (d.getType() == datagram::control){   //DV update
 
                         //Loop through neighbours to determine which one was the source and reset the receive time count
-                        for (std::size_t i = 0; i < dv.getNeighbours().size(); i++){
-                            if (dv.getNeighbours().at(i).nextHopID == d.getID()){ //When the neighbour is found reset the received count
+                        int i = 0;
+                        for (struct neighbour n : dv.getNeighbours()){
+                            if (n.ID == d.getID()){ //When the neighbour is found reset the received count
                                 timeSinceReceived.at(i) = 0; //Reset the time since communication with the router
                                
-                                if (!live.at(i)){   //If the router was not alive the dv must be reset to the original link cost
-                                    live.at(i) = true;
+                                if (!n.live){   //If the router was not alive the dv must be reset to the original link cost
                                     std::cout << "Router " << d.getID() << " joined" << std::endl;
                                     dv.restoreLink(d.getID()); 
                                     log->recordRouterJoin(dv, d.getID());                
                                 }
                                 break;
                             }
+                            i++;
                         }
           
                         struct dv_update update = dv.buildDVUpdate(d.getPayload());
@@ -158,9 +156,9 @@ void router::broadcast(bool control, std::vector<uint8_t> payload){
     datagram new_datagram(datagram::type(control), routerID, 'A', routerID, payload); //The datagram is initialised with destination A arbitrarily bevause it will be changed in the loop
 
     for (std::size_t i = 0; i < dv.getNeighbours().size(); i++){
-        if (live.at(i)){    
+        if (dv.getNeighbours().at(i).live){    
 
-            new_datagram.setDestID(dv.getNeighbours().at(i).nextHopID);
+            new_datagram.setDestID(dv.getNeighbours().at(i).ID);
                 udp::endpoint ep = udp::endpoint(boost::asio::ip::address::from_string(dv.getNeighbours().at(i).ip), dv.getNeighbours().at(i).port);
 
             socket_->async_send_to(
@@ -183,5 +181,4 @@ router::~router(){
 
     buffer.resize(0);
     timeSinceReceived.resize(0);
-    live.resize(0);
 }

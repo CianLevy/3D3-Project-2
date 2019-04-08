@@ -26,8 +26,7 @@
 
     Note: the implementation of this class will be very similar to the datagram class
 */
-struct link
- {
+struct link{
     char            nextHopID; //ID of the router the link connects to
     std::string     ip; //Link router's IP
     uint16_t        port; //Link router's listening port
@@ -39,15 +38,24 @@ struct dv_update{
     std::vector<uint8_t>    costs;
 };
 
+struct neighbour{
+    char            ID;
+    std::string     ip;
+    uint16_t        port;
+    uint8_t         cost;
+    bool            live;
+};
+
 class distance_vector {
     private:
         char                            routerID;
         std::vector<struct link>        currentDV; //The actual distance vector. Node ids correspond to their location in the vector where the current cost is stored
-        std::vector<struct link>        immediateNeighbours;
+        std::vector<struct neighbour>   immediateNeighbours;
         uint16_t                        listenPort;
 
 
         struct link buildLink(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_);
+        struct neighbour buildNeighbour(char routerID_, std::string ip_, uint16_t port_, uint8_t cost_, bool live_);
     
     public:
         distance_vector(char ID, std::string topologyCSV);
@@ -65,7 +73,9 @@ class distance_vector {
         void restoreLink(char ID);
 
         std::vector<struct link> getCurrentDV(){return currentDV;};
-        std::vector<struct link> getNeighbours(){ return immediateNeighbours; };
+        std::vector<struct neighbour> getNeighbours(){ return immediateNeighbours; };
+        struct neighbour getNeighbourLiveness(char ID);
 
         uint16_t getListenPort(){ return listenPort; };
+        void setNeighbourLiveness(bool live_, char ID);
 };
